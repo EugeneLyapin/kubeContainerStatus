@@ -2,6 +2,15 @@
 kube container status
 
 ## Usage
+Environment variables:
+
+* `PROJECT_NAME` - project name (labels[app]), required
+* `NAMESPACE` - namespace, default:default
+* `TOKEN` - k8s token, default:none
+* `AWS_CLUSTER` - AWS Cluster name, default:none
+* `TIMEOUT` - timeout in sec, default:180 
+
+Example:
 ```bash
-perl -I. kubeContainerStatus.pl -t 180 -a myapp -n myapp
+PROJECT_NAME=myapp perl -I. kubeContainerStatus.pl
 ```
