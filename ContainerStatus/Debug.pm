@@ -4,7 +4,6 @@ use 5.008008;
 use strict;
 use Exporter;
 use base qw( Exporter );
-use Data::Dumper;
 use POSIX qw(strftime);
 use POSIX qw(getpid);
 
