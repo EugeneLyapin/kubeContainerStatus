@@ -3,7 +3,6 @@ package ContainerStatus::Config;
 use 5.008008;
 use strict;
 use Exporter;
-use FindBin qw($Bin);
 use base qw( Exporter );
 use ContainerStatus::Debug;
 

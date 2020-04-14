@@ -3,7 +3,6 @@ package ContainerStatus::Debug;
 use 5.008008;
 use strict;
 use Exporter;
-use FindBin qw($Bin);
 use base qw( Exporter );
 use Data::Dumper;
 use POSIX qw(strftime);
