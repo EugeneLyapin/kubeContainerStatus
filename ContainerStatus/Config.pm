@@ -6,7 +6,6 @@ use Exporter;
 use FindBin qw($Bin);
 use base qw( Exporter );
 use ContainerStatus::Debug;
-use Getopt::Long;
 
 our @EXPORT = qw(
             getConf
@@ -15,15 +14,18 @@ our @EXPORT = qw(
 sub getConf {
     my %opts = ();
     my $conf = {};
-    GetOptions( \%opts, 'timeout=n', 'namespace=s', 'application=s' );
-    my $timeout = $opts{timeout} || 180;
-    my $namespace = $opts{namespace} || 'default';
-    my $application = $opts{application} || undef;
-    errx('application is not defined') if not defined $application;
-    $conf = {
-        timeout => $timeout,
-        application => $application,
-        namespace => $namespace
+    my $TIMEOUT = $ENV{TIMEOUT} || 180;
+    my $NAMESPACE = $ENV{NAMESPACE} || 'default';
+    my $PROJECT_NAME = $ENV{PROJECT_NAME} || undef;
+    my $AWS_CLUSTER = $ENV{AWS_CLUSTER} || undef;
+    my $TOKEN = $ENV{TOKEN} || undef;
+    errx('PROJECT_NAME is not defined') if not defined $PROJECT_NAME;
+    my $kubeargs = "--namespace $NAMESPACE -l app=$ENV{PROJECT_NAME}";
+    $kubeargs .= " --token=$TOKEN" if defined $TOKEN;
+    $kubeargs .= " --cluster $AWS_CLUSTER" if defined $AWS_CLUSTER;
+    my $conf = {
+        TIMEOUT => $TIMEOUT,
+        kubeargs => $kubeargs
     };
     return $conf;
 }

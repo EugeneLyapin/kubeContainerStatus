@@ -16,7 +16,7 @@ sub getContainerStatus {
     my $conf = shift;
     local $/;
     #my $jsondata = <STDIN>;
-    my $jsondata = qx{kubectl get pods -n $conf->{namespace} -l app=$conf->{application} -o json 2>&1};
+    my $jsondata = qx{kubectl get pods $conf->{kubeargs} -o json 2>&1};
     my $cmdres = $?;
     errx('kubectl error: ' . $jsondata) if ( $cmdres ne 0);
     my $data = decode_json($jsondata);

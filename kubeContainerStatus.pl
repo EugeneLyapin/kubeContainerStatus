@@ -10,6 +10,6 @@ my $conf = getConf();
 for (my $i=0; $i <= int($conf->{timeout}*1.5); $i++) {
     sleep 12;
     my $now = time();
-    errx("timeout") if ($now - $starttime > $conf->{timeout});
+    errx("timeout") if ($now - $starttime > $conf->{TIMEOUT});
     getContainerStatus($conf);
 }
