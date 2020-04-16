@@ -4,6 +4,7 @@ use 5.008008;
 use strict;
 use Exporter;
 use base qw( Exporter );
+use JSON::PP;
 use ContainerStatus::Debug;
 
 our @EXPORT = qw(
@@ -12,7 +13,6 @@ our @EXPORT = qw(
 
 sub getConf {
     my %opts = ();
-    my $conf = {};
     my $TIMEOUT = $ENV{TIMEOUT} || 300;
     my $DELAY = $ENV{DELAY} || 30;
     my $CYCLES = int($TIMEOUT*2/$DELAY);
@@ -32,8 +32,12 @@ sub getConf {
         DELAY => $DELAY,
         CYCLES => $CYCLES,
         RUNNING_CYCLES => $RUNNING_CYCLES,
-        kubeargs => $kubeargs
     };
+
+    debug(encode_json($conf));
+
+    # do not show sensitive data
+    $conf->{kubeargs} = $kubeargs;
     return $conf;
 }
 

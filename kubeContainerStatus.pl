@@ -15,9 +15,10 @@ for (my $i=0; $i <= $conf->{CYCLES}; $i++) {
     my $res = getContainerStatus($conf);
     $running++ if $res == 0;
     $running = 0 if $res > 0;
+
     if ($difftime > $conf->{TIMEOUT}) {
-        quit('All containers are running') if $running >= 0;
+        quit('All containers are running after timeout') if $running > 0;
         errx("timeout");
     }
-    quit('All containers are running') if $running > $conf->{RUNNING_CYCLES};
+    quit('All containers are running') if $running >= $conf->{RUNNING_CYCLES};
 }
