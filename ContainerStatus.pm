@@ -75,6 +75,7 @@ sub getContainerStatus {
         }
     }
 
+    debug('containers='. $containers . ',' . 'running=' . $PodStatus->{running});
     quit('All pods are running') if ($PodStatus->{running} eq $containers and $containers > 0);
     return 0;
 }
