@@ -8,7 +8,8 @@ Environment variables:
 * `NAMESPACE` - namespace, default:default
 * `TOKEN` - k8s token, default:none
 * `AWS_CLUSTER` - AWS Cluster name, default:none
-* `TIMEOUT` - timeout in sec, default:180 
+* `TIMEOUT` - timeout in sec, default:180
+* `DELAY` - delay before check in sec, default:15
 
 Example:
 ```bash

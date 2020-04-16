@@ -14,6 +14,7 @@ sub getConf {
     my %opts = ();
     my $conf = {};
     my $TIMEOUT = $ENV{TIMEOUT} || 180;
+    my $DELAY = $ENV{DELAY} || 15;
     my $NAMESPACE = $ENV{NAMESPACE} || 'default';
     my $PROJECT_NAME = $ENV{PROJECT_NAME} || undef;
     my $AWS_CLUSTER = $ENV{AWS_CLUSTER} || undef;
@@ -24,6 +25,7 @@ sub getConf {
     $kubeargs .= " --cluster $AWS_CLUSTER" if defined $AWS_CLUSTER;
     my $conf = {
         TIMEOUT => $TIMEOUT,
+        DELAY => $DELAY,
         kubeargs => $kubeargs
     };
     return $conf;
