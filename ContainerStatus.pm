@@ -22,7 +22,6 @@ sub getContainerStatus {
     my $items = $data->{items} || [];
     errx('no data') if (scalar @{$items} eq 0);
 
-    my $PodStatus = {};
     my $ErrCodes = {
         'waiting' => {
             'ErrImagePull' => 0,
@@ -60,7 +59,6 @@ sub getContainerStatus {
             my $status = $containerStatus->{state};
             my $s = (%{$status})[0];
             debug(encode_json($status));
-
             if (ishash($ErrCodes->{$s})) {
                 my $reason = $status->{$s}->{reason};
                 errx($reason) if defined $ErrCodes->{$s}->{$reason};
@@ -71,12 +69,12 @@ sub getContainerStatus {
                 return 0 if defined $PendingCodes->{$s}->{$reason};
             }
 
-            $PodStatus->{$s}++ if (ishash($RunningCodes->{$s}));
+            $RunningCodes->{$s}++ if defined $RunningCodes->{$s};
         }
     }
 
-    debug('containers='. $containers . ',' . 'running=' . $PodStatus->{running});
-    quit('All pods are running') if ($PodStatus->{running} eq $containers and $containers > 0);
+    debug('containers='. $containers . ' running=' . $RunningCodes->{running});
+    quit('All pods are running') if ($RunningCodes->{running} eq $containers and $containers > 0);
     return 0;
 }
 
