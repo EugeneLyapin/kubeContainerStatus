@@ -66,7 +66,7 @@ sub getContainerStatus {
 
             if (ishash($PendingCodes->{$s})) {
                 my $reason = $status->{$s}->{reason};
-                return 0 if defined $PendingCodes->{$s}->{$reason};
+                return 1 if defined $PendingCodes->{$s}->{$reason};
             }
 
             $RunningCodes->{$s}++ if defined $RunningCodes->{$s};
@@ -74,8 +74,8 @@ sub getContainerStatus {
     }
 
     debug('containers='. $containers . ' running=' . $RunningCodes->{running});
-    quit('All pods are running') if ($RunningCodes->{running} eq $containers and $containers > 0);
-    return 0;
+    return 0 if ($RunningCodes->{running} eq $containers and $containers > 0);
+    return 1;
 }
 
 # check if variable is hash
