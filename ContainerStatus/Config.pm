@@ -62,6 +62,7 @@ sub getConf {
         'Pending' => {
             'waiting' => [
                 'ContainerCreating',
+                'PodInitializing',
             ]
         },
 
@@ -71,18 +72,21 @@ sub getConf {
     };
 
     my $conf = {
-        TIMEOUT => $TIMEOUT,
-        DELAY => $DELAY,
-        CYCLES => $CYCLES,
-        RUNNING_CYCLES => $RUNNING_CYCLES
+        Options => {
+            TIMEOUT => $TIMEOUT,
+            DELAY => $DELAY,
+            CYCLES => $CYCLES,
+            RUNNING_CYCLES => $RUNNING_CYCLES
+        },
+        Statistics => {},
+        kubeargs => $kubeargs
     };
 
-    debug(encode_json($conf));
+    debug(encode_json($conf->{Options}));
     for my $state (keys %{$ContainerStatuses}) {
         $conf->{ContainerStatuses}->{$state} = convertCodeListToHash($ContainerStatuses->{$state});
     }
 
-    $conf->{kubeargs} = $kubeargs;
     return $conf;
 }
 

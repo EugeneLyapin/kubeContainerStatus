@@ -32,9 +32,13 @@ sub getContainerStatus {
         my $ContainerStatuses = $item->{status}->{containerStatuses};
         $containers += scalar @{$ContainerStatuses};
         foreach my $ContainerStatus (@{$ContainerStatuses}) {
+            my $Id = $ContainerStatus->{containerID};
+            my $restartCount = $ContainerStatus->{restartCount};
             my $status = $ContainerStatus->{state};
             my $s = (%{$status})[0];
+
             debug(encode_json($status));
+
             if (ishash($ErrCodes->{$s})) {
                 my $reason = $status->{$s}->{reason};
                 errx($reason) if defined $ErrCodes->{$s}->{$reason};
@@ -45,13 +49,37 @@ sub getContainerStatus {
                 return 1 if defined $PendingCodes->{$s}->{$reason};
             }
 
-            $running++ if ishash($RunningCodes->{$s});
+            if (ishash($RunningCodes->{$s})) {
+                $running++;
+                if (getStatistics($conf, $Id, 'restartCount') < $restartCount) {
+                    updateStatistics($conf, $Id, 'restartCount', $restartCount);
+                    debug('State=UNSTABLE ContainerID='.$Id.' restartCount='.$restartCount);
+                    $running--;
+                }
+            }
         }
     }
 
     debug('containers='. $containers . ' running=' . $running);
     return 0 if ($running eq $containers and $containers > 0);
     return 1;
+}
+
+sub getStatistics {
+    my $conf = shift;
+    my $Id = shift;
+    my $key = shift;
+    return 0 unless ishash($conf->{Statistics}->{$Id});
+    return 0 unless defined $conf->{Statistics}->{$Id}->{$key};
+    return $conf->{Statistics}->{$Id}->{$key};
+}
+
+sub updateStatistics {
+    my $conf = shift;
+    my $Id = shift;
+    my $key = shift;;
+    my $value = shift;
+    $conf->{Statistics}->{$Id}->{$key} = $value;
 }
 
 # check if variable is hash
