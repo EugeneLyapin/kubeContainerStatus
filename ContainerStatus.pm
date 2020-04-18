@@ -21,42 +21,17 @@ sub getContainerStatus {
     my $data = decode_json($jsondata);
     my $items = $data->{items} || [];
     errx('no data') if (scalar @{$items} eq 0);
-
-    my $ErrCodes = {
-        'waiting' => {
-            'ErrImagePull' => 0,
-            'CrashLoopBackOff' => 0,
-            'ImagePullBackOff' => 0,
-            'CreateContainerConfigError' => 0,
-            'InvalidImageName' => 0,
-            'CreateContainerError' => 0,
-        },
-        'terminated' => [
-            'OOMKilled' => 0,
-            'Error' => 0,
-            'Completed' => 0,
-            'ContainerCannotRun' => 0,
-            'DeadlineExceeded' => 0
-        ]
-    };
-
-    my $PendingCodes = {
-        'waiting' => {
-            'ContainerCreating' => 0,
-        }
-    };
-
-    my $RunningCodes = {
-        'running' => 0
-    };
-
     my $containers = 0;
+    my $ContainerStatuses = $conf->{ContainerStatuses};
+    my $ErrCodes = $ContainerStatuses->{Error};
+    my $PendingCodes = $ContainerStatuses->{Pending};
+    my $RunningCodes = $ContainerStatuses->{Running};
 
     foreach my $item (@{$items}) {
-        my $containerStatuses = $item->{status}->{containerStatuses};
-        $containers += scalar @{$containerStatuses};
-        foreach my $containerStatus (@{$containerStatuses}) {
-            my $status = $containerStatus->{state};
+        my $ContainerStatuses = $item->{status}->{ContainerStatuses};
+        $containers += scalar @{$ContainerStatuses};
+        foreach my $ContainerStatus (@{$ContainerStatuses}) {
+            my $status = $ContainerStatus->{state};
             my $s = (%{$status})[0];
             debug(encode_json($status));
             if (ishash($ErrCodes->{$s})) {
@@ -69,7 +44,7 @@ sub getContainerStatus {
                 return 1 if defined $PendingCodes->{$s}->{$reason};
             }
 
-            $RunningCodes->{$s}++ if defined $RunningCodes->{$s};
+            $RunningCodes->{$s}++ if ishash($RunningCodes->{$s});
         }
     }
 

@@ -11,6 +11,19 @@ our @EXPORT = qw(
             getConf
         );
 
+sub convertCodeListToHash {
+    my $codes = shift;
+    my $items = {};
+    for my $state (keys %{$codes}) {
+        $items->{$state} = {};
+        my $ContainerStatuses = $codes->{$state};
+        for my $ContainerStatus (@{$ContainerStatuses}) {
+            $items->{$state}->{$ContainerStatus} = 0;
+        }
+    }
+    return $items;
+}
+
 sub getConf {
     my %opts = ();
     my $TIMEOUT = $ENV{TIMEOUT} || 300;
@@ -27,16 +40,49 @@ sub getConf {
     my $kubeargs = "--namespace $NAMESPACE -l app=$ENV{PROJECT_NAME}";
     $kubeargs .= " --token=$TOKEN" if defined $TOKEN;
     $kubeargs .= " --cluster $AWS_CLUSTER" if defined $AWS_CLUSTER;
+    my $ContainerStatuses = {
+        'Error' => {
+            'waiting' => [
+                'ErrImagePull',
+                'CrashLoopBackOff',
+                'ImagePullBackOff',
+                'CreateContainerConfigError',
+                'InvalidImageName',
+                'CreateContainerError',
+            ],
+            'terminated' => [
+                'OOMKilled',
+                'Error',
+                'Completed',
+                'ContainerCannotRun',
+                'DeadlineExceeded',
+            ]
+        },
+
+        'Pending' => {
+            'waiting' => [
+                'ContainerCreating',
+            ]
+        },
+
+        'Running' => {
+            'running' => []
+        }
+    };
+
     my $conf = {
         TIMEOUT => $TIMEOUT,
         DELAY => $DELAY,
         CYCLES => $CYCLES,
-        RUNNING_CYCLES => $RUNNING_CYCLES,
+        RUNNING_CYCLES => $RUNNING_CYCLES
     };
 
     debug(encode_json($conf));
 
-    # do not show sensitive data
+    for my $state (keys %{$ContainerStatuses}) {
+        $conf->{ContainerStatuses}->{$state} = convertCodeListToHash($ContainerStatuses->{$state});
+    }
+
     $conf->{kubeargs} = $kubeargs;
     return $conf;
 }
