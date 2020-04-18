@@ -22,13 +22,14 @@ sub getContainerStatus {
     my $items = $data->{items} || [];
     errx('no data') if (scalar @{$items} eq 0);
     my $containers = 0;
+    my $running = 0;
     my $ContainerStatuses = $conf->{ContainerStatuses};
     my $ErrCodes = $ContainerStatuses->{Error};
     my $PendingCodes = $ContainerStatuses->{Pending};
     my $RunningCodes = $ContainerStatuses->{Running};
 
     foreach my $item (@{$items}) {
-        my $ContainerStatuses = $item->{status}->{ContainerStatuses};
+        my $ContainerStatuses = $item->{status}->{containerStatuses};
         $containers += scalar @{$ContainerStatuses};
         foreach my $ContainerStatus (@{$ContainerStatuses}) {
             my $status = $ContainerStatus->{state};
@@ -44,12 +45,12 @@ sub getContainerStatus {
                 return 1 if defined $PendingCodes->{$s}->{$reason};
             }
 
-            $RunningCodes->{$s}++ if ishash($RunningCodes->{$s});
+            $running++ if ishash($RunningCodes->{$s});
         }
     }
 
-    debug('containers='. $containers . ' running=' . $RunningCodes->{running});
-    return 0 if ($RunningCodes->{running} eq $containers and $containers > 0);
+    debug('containers='. $containers . ' running=' . $running);
+    return 0 if ($running eq $containers and $containers > 0);
     return 1;
 }
 

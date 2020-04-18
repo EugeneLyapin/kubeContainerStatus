@@ -6,7 +6,7 @@ use ContainerStatus::Config;
 
 my $starttime = time();
 my $conf = getConf();
-my $running;
+my $running = 0;
 
 for (my $i=0; $i <= $conf->{CYCLES}; $i++) {
     sleep $conf->{DELAY};
@@ -22,3 +22,6 @@ for (my $i=0; $i <= $conf->{CYCLES}; $i++) {
     }
     quit('All containers are running') if $running >= $conf->{RUNNING_CYCLES};
 }
+
+exit(1);
+

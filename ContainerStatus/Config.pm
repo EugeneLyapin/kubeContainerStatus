@@ -78,7 +78,6 @@ sub getConf {
     };
 
     debug(encode_json($conf));
-
     for my $state (keys %{$ContainerStatuses}) {
         $conf->{ContainerStatuses}->{$state} = convertCodeListToHash($ContainerStatuses->{$state});
     }
