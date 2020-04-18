@@ -50,7 +50,10 @@ Based on this data `kubeContainerStatus` returns exitcode=0 if:
 `kubeContainerStatus` returns exitcode=1 if:
 * One or more containers have `ContainerStateWaiting` state and reason regarded as `Error` (see below);
 * One or more containers have `ContainerStateTerminated` state;
-* Execution time > TIMEOUT (optional, default:300) and one or more containers have `ContainerStateWaiting` state and `ContainerCreating` reason;
+* Execution time > TIMEOUT (optional, default:300) due to `UNSTABLE` or `ContainerStateWaiting` states;
+
+`kubeContainerStatus` sets state=UNSTABLE if:
+* one or more containers have `restartCount` changed since last check;
 
 ## Container states and reasons:
 ```code
@@ -86,7 +89,7 @@ Running:
 * `AWS_CLUSTER` - AWS Cluster name, default:none
 * `TIMEOUT` - the timeout in sec, default:300
 * `DELAY` - the delay before check in sec, default:30
-* `RUNNING_CYCLES` - the number N of times to watch with DELAY if all containers running, default:`TIMEOUT/(DELAY*2)`
+* `RUNNING_CYCLES` - the number N of times to watch with DELAY if all containers running, default:7
 
 `kubeContainerStatus` uses `kubectl get pods -l app=kubernetes-bootcamp` so that you should set label app=kubernetes-bootcamp in kube spec.
 
