@@ -30,7 +30,7 @@ sub getContainerImageTag {
     my $cmd = "kubectl get pods $conf->{kubeargs} -o json 2>&1";
     my $jsondata = qx{ $cmd };
     my $cmdres = $?;
-    errx('kubectl error: ' . $jsondata) if ( $cmdres ne 0);
+    errx('kubectl error: ' . $jsondata) if ( $cmdres ne 0 );
     my $data = decode_json($jsondata);
     my $items = $data->{items} || [];
     errx('no data') if (scalar @{$items} eq 0);
