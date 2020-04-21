@@ -1,4 +1,4 @@
-package ContainerStatus::Debug;
+package Kube::Debug;
 
 use 5.008008;
 use strict;
@@ -11,6 +11,7 @@ our @EXPORT = qw(
             debug
             errx
             quit
+            pquit
         );
 
 sub errx {
@@ -30,6 +31,12 @@ sub quit {
     exit(0);
 }
 
+sub pquit {
+    my $msg = shift;
+    printf("%s\n", $msg);
+    exit(0);
+}
+
 sub logger {
     my (%args) = @_;
     my $level = $args{level} || 'INFO';
@@ -37,7 +44,7 @@ sub logger {
     return 0 if not defined $msg;
     my $curtime = strftime "%Y-%m-%d %H:%M:%S", localtime;
     my $pid = getpid();
-    print STDOUT "$curtime ContainerStatus[$pid] [$level] $msg\n";
+    print STDOUT "$curtime logger[$pid] [$level] $msg\n";
     return 0;
 }
 

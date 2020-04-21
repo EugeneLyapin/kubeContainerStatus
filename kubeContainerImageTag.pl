@@ -1,21 +1,15 @@
 use strict;
 use JSON::PP;
-use ContainerStatus::Debug;
+use Kube::Debug;
+use Kube::Config;
 
 sub getConf {
     my %opts = ();
-    my $NAMESPACE = $ENV{NAMESPACE} || 'default';
-    my $PROJECT_NAME = $ENV{PROJECT_NAME} || undef;
-    my $AWS_CLUSTER = $ENV{AWS_CLUSTER} || undef;
-    my $TOKEN = $ENV{TOKEN} || undef;
+    my $kubeargs = getKubeArgs();
     my $CI_REGISTRY_IMAGE = $ENV{CI_REGISTRY_IMAGE} || undef;
     my $TAG_NAME = $ENV{TAG_NAME} || undef;
-    errx('PROJECT_NAME is not defined') if not defined $PROJECT_NAME;
     errx('CI_REGISTRY_IMAGE is not defined') if not defined $CI_REGISTRY_IMAGE;
     errx('TAG_NAME is not defined') if not defined $TAG_NAME;
-    my $kubeargs = "--namespace $NAMESPACE -l app=$ENV{PROJECT_NAME}";
-    $kubeargs .= " --token=$TOKEN" if defined $TOKEN;
-    $kubeargs .= " --cluster $AWS_CLUSTER" if defined $AWS_CLUSTER;
 
     my $conf = {
         NewImageName => "$CI_REGISTRY_IMAGE:$TAG_NAME",
@@ -38,7 +32,7 @@ sub getContainerImageTag {
         my $Containers = $item->{spec}->{containers};
         for my $Container (@{$Containers}) {
             my $state = ( $Container->{image} eq $conf->{NewImageName} ) ? 'ImageTagNotChanged' : 'ImageTagChanged';
-            quit($state);
+            pquit($state);
         }
     }
 }
