@@ -1,7 +1,7 @@
 use strict;
 
-use Kube::Debug;
-use ContainerStatus;
+use Container::Debug;
+use Container::Status;
 
 sub main() {
     my $starttime = time();

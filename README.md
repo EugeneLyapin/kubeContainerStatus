@@ -1,4 +1,4 @@
-# kubeContainerStatus
+# ContainerStatus
 
 An automation script used to verify a deployment update.
 
@@ -40,19 +40,19 @@ kubectl describe pods -l app=kubernetes-bootcamp
 ```
 There is no image called v2 in the repository. We should roll back to our previously working version.
 
-`kubeContainerStatus` is an automation script to verify a deployment update.
+`ContainerStatus` is an automation script to verify a deployment update.
 
 It checks deployment status periodicaly analyzing container statuses and historical data from previous check cycles.
 
-Based on this data `kubeContainerStatus` returns exitcode=0 if:
+Based on this data `ContainerStatus` returns exitcode=0 if:
 * All containers are running (`ContainerStateRunning` state) within N cycles;
 
-`kubeContainerStatus` returns exitcode=1 if:
+`ContainerStatus` returns exitcode=1 if:
 * One or more containers have `ContainerStateWaiting` state and reason regarded as `Error` (see below);
 * One or more containers have `ContainerStateTerminated` state;
 * Execution time > TIMEOUT (optional, default:300) due to `UNSTABLE` or `ContainerStateWaiting` states;
 
-`kubeContainerStatus` sets state=UNSTABLE if:
+`ContainerStatus` sets state=UNSTABLE if:
 * one or more containers have `restartCount` changed since last check;
 
 ## Container states and reasons:
@@ -76,6 +76,7 @@ Error:
 Pending:
   waiting:
   - ContainerCreating
+  - PodInitializing
 
 Running:
   running: []
@@ -91,7 +92,7 @@ Running:
 * `DELAY` - the delay before check in sec, default:30
 * `RUNNING_CYCLES` - the number N of times to watch with DELAY if all containers running, default:7
 
-`kubeContainerStatus` uses `kubectl get pods -l app=kubernetes-bootcamp` so that you should set label app=kubernetes-bootcamp in kube spec.
+`ContainerStatus` uses `kubectl get pods -l app=kubernetes-bootcamp` so that you should set label app=kubernetes-bootcamp in kube spec.
 
 Example:
 ```code
@@ -101,7 +102,7 @@ labels:
 
 ## Usage
 ```bash
-PROJECT_NAME=kubernetes-bootcamp TIMEOUT=180 DELAY=20 RUNNING_CYCLES=5 perl -I. kubeContainerStatus.pl
+PROJECT_NAME=kubernetes-bootcamp TIMEOUT=180 DELAY=20 RUNNING_CYCLES=5 perl -I. ContainerStatus.pl
 ```
 ## Links
 https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core

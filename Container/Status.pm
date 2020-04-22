@@ -1,12 +1,12 @@
-package ContainerStatus;
+package Container::Status;
 
 use 5.008008;
 use strict;
 use Exporter;
 use base qw( Exporter );
 use JSON::PP;
-use Kube::Debug;
-use Kube::Config;
+use Container::Debug;
+use Container::Config;
 
 our @EXPORT = qw(
             getContainerStatus
@@ -88,9 +88,10 @@ sub getConf {
 sub getContainerStatus {
     my $conf = shift;
     local $/;
-    my $cmd = "kubectl get pods $conf->{kubeargs} -o json 2>&1";
+    my $cmd = "timeout=1 kubectl get pods $conf->{kubeargs} -o json 2>&1";
     my $jsondata = qx{ $cmd };
     my $cmdres = $?;
+
     errx('kubectl error: ' . $jsondata) if ( $cmdres ne 0);
     my $data = decode_json($jsondata);
     my $items = $data->{items} || [];

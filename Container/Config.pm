@@ -1,10 +1,10 @@
-package Kube::Config;
+package Container::Config;
 
 use 5.008008;
 use strict;
 use Exporter;
 use base qw( Exporter );
-use Kube::Debug;
+use Container::Debug;
 
 our @EXPORT = qw(
             getKubeArgs

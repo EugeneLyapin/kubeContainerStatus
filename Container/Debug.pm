@@ -1,4 +1,4 @@
-package Kube::Debug;
+package Container::Debug;
 
 use 5.008008;
 use strict;

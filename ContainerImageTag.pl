@@ -1,7 +1,7 @@
 use strict;
 use JSON::PP;
-use Kube::Debug;
-use Kube::Config;
+use Container::Debug;
+use Container::Config;
 
 sub getConf {
     my %opts = ();
@@ -19,7 +19,7 @@ sub getConf {
     return $conf;
 }
 
-sub getContainerImageTag {
+sub main {
     my $conf = getConf();
     my $cmd = "kubectl get pods $conf->{kubeargs} -o json 2>&1";
     my $jsondata = qx{ $cmd };
@@ -37,4 +37,4 @@ sub getContainerImageTag {
     }
 }
 
-getContainerImageTag();
+main();
