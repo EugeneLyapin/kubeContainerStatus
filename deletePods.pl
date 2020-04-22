@@ -1,4 +1,6 @@
 use strict;
+
+use JSON::PP;
 use Container::Debug;
 use Container::Config;
 
