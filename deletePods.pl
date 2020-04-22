@@ -61,12 +61,13 @@ sub updateImages {
         image1 => $data->{$key},
         image2 => $value
     }));
-    quit('SKIP, existing images are different');
+
+    quit('SKIP deleting pods, existing images are different');
 }
 
 sub main {
     my $conf = getConf();
-    quit('SKIP, nothing to do') unless isImageTagChanged($conf);
+    quit('SKIP deleting pods, image changes') if isImageTagChanged($conf);
     my $cmd = "kubectl delete pods $conf->{kubeargs} 2>&1";
     my $data = qx{ $cmd };
     my $cmdres = $?;
