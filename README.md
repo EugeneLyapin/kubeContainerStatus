@@ -1,8 +1,12 @@
-# ContainerStatus
+# CI/CD pipeline kubernetes helpers
+
+## TL;DR;
+
+## ContainerStatus
 
 An automation script used to verify a deployment update.
 
-## Scenario
+### Scenario
 ### Step 1: Update the version of the app
 
 To list your deployments use the get deployments command:
@@ -40,6 +44,7 @@ kubectl describe pods -l app=kubernetes-bootcamp
 ```
 There is no image called v2 in the repository. We should roll back to our previously working version.
 
+### How it works
 `ContainerStatus` is an automation script to verify a deployment update.
 
 It checks deployment status periodicaly analyzing container statuses and historical data from previous check cycles.
@@ -82,7 +87,7 @@ Running:
   running: []
 ```
 
-## Environment variables:
+### Environment variables:
 
 * `PROJECT_NAME` - the project name, required
 * `NAMESPACE` - the namespace, default:default
@@ -100,9 +105,57 @@ labels:
   app: kubernetes-bootcamp
 ```
 
-## Usage
+### Usage
 ```bash
 PROJECT_NAME=kubernetes-bootcamp TIMEOUT=180 DELAY=20 RUNNING_CYCLES=5 perl -I. ContainerStatus.pl
 ```
-## Links
+### Links
 https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#containerstate-v1-core
+
+## TL;DR;
+
+## deletePods
+
+A workaround script used to verify a docker image tag and delete pods if tag is not changed.
+
+### Scenario
+
+We should always change the image tag when deploying a new version.
+
+But sometimes we have a situation when we need to redeploy release without changing new version.
+
+There are 3 approaches to do this:
+* Refer to the image hash instead of tag, e.g. `localhost:5000/andy/busybox@sha256:2aac5e7514fbc77125bd315abe9e7b0257db05fe498af01a58e239ebaccf82a8`
+* Use latest tag or `imagePullPolicy: Always` and delete the pods. New pods will pull the new image. This approach doesn't do a rolling update and will result in downtime.
+* Fake a change to the Deployment by changing something other than the image.
+
+The approach we will use is to verify the docker image tag and delete the pods if tag is not changed since last update.
+
+### How it works
+`deletePods` get container images from pods json specs using `kubectl get pods -l app=kubernetes-bootcamp`.
+
+Based on this data `deletePods` checks if images match for containers with the same name. The script stops if the condition is not met.
+
+Then `deletePods` compares the image name for the corresponding container. If it matches the new image name the script runs `kubectl delete pods -l app=kubernetes-bootcamp`
+
+### Environment variables:
+
+* `PROJECT_NAME` - the project name, required
+* `NAMESPACE` - the namespace, default:default
+* `TOKEN` - k8s token, default:none
+* `AWS_CLUSTER` - AWS Cluster name, default:none
+* `CI_REGISTRY_IMAGE` - the name of docker image registry
+* `TAG_NAME` - the name of docker image tag
+
+`deletePods` uses `kubectl get|delete pods -l app=kubernetes-bootcamp` so that you should set label app=kubernetes-bootcamp in kube spec.
+
+Example:
+```code
+labels:
+  app: kubernetes-bootcamp
+```
+
+### Usage
+```bash
+PROJECT_NAME=kubernetes-bootcamp CI_REGISTRY_IMAGE=registry.gitlab.com/test/kubernetes-bootcamp TAG_NAME=1.0 perl -I. deletePods.pl
+```

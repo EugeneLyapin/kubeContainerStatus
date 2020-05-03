@@ -38,7 +38,7 @@ sub isImageTagChanged {
     }
 
     foreach my $item (keys %{$images}) {
-        return 0 if $data->{$item} eq $conf->{image};
+        return 0 if $images->{$item} eq $conf->{image};
     }
 
     return 1;
